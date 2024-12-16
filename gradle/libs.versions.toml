@@ -1,6 +1,6 @@
 [versions]
 # libraries
-junit = "5.11.0"
+junit = "5.11.4"
 lombok = "1.18.34"
 guava = "33.3.1-jre"
 druid = "1.2.23"
