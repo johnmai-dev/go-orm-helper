@@ -10,10 +10,10 @@ annotations = "24.1.0"
 
 # plugins
 changelog = "2.2.1"
-intelliJPlatform = "2.0.1"
+intelliJPlatform = "2.1.0"
 kotlin = "1.9.25"
 kover = "0.8.3"
-qodana = "2024.1.9"
+qodana = "2024.2.3"
 
 [libraries]
 junit = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
