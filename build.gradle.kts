@@ -1,5 +1,4 @@
 import org.jetbrains.changelog.Changelog
-import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {

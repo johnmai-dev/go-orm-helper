@@ -25,7 +25,7 @@ public class SQL2GormStruct extends SQL2Struct {
             stringBuilder.append("primaryKey;");
         }
 
-        if (definition.containsNotNullConstaint()) {
+        if (definition.containsNotNullConstraint()) {
             stringBuilder.append("not null;");
         }
 
