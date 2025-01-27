@@ -10,6 +10,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -19,13 +20,15 @@ public class SQL2StructAction extends AnAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
 
-        GoORMHelperProjectSettings.State state = Objects.requireNonNull(GoORMHelperProjectSettings.getInstance(Objects.requireNonNull(e.getProject())).getState());
+        Project project = e.getProject();
+
+        GoORMHelperProjectSettings.State state = Objects.requireNonNull(GoORMHelperProjectSettings.getInstance(Objects.requireNonNull(project)).getState());
 
         Types.ORM selectedORM = state.defaultORM;
         Types.Database selectedDatabase = state.defaultDatabase;
 
         if (selectedORM == Types.ORM.AskEveryTime || selectedDatabase == Types.Database.AskEveryTime) {
-            ConvertSettingDialogWrapper wrapper = new ConvertSettingDialogWrapper(e.getProject());
+            ConvertSettingDialogWrapper wrapper = new ConvertSettingDialogWrapper(project);
             if (!wrapper.showAndGet()) return;
 
             selectedORM = (Types.ORM) wrapper.getOrmComponent().getComponent().getSelectedItem();
@@ -44,12 +47,14 @@ public class SQL2StructAction extends AnAction {
         final Types.ORM finalSelectedORM = selectedORM;
         final Types.Database finalSelectedDatabase = selectedDatabase;
 
-        WriteCommandAction.runWriteCommandAction(e.getProject(), () -> {
+        WriteCommandAction.runWriteCommandAction(project, () -> {
             if (text == null || text.isEmpty() || finalSelectedORM == null || finalSelectedDatabase == null) return;
 
-            ISQL2Struct sql2Struct = finalSelectedORM.sql2Struct(text, finalSelectedDatabase.toDbType());
+            ISQL2Struct sql2Struct = finalSelectedORM.sql2Struct(project, text, finalSelectedDatabase.toDbType());
 
-            editor.getDocument().replaceString(start, end, sql2Struct.convert());
+            if (sql2Struct != null) {
+                editor.getDocument().replaceString(start, end, sql2Struct.convert());
+            }
         });
     }
 }

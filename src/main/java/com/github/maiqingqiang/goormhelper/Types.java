@@ -6,6 +6,7 @@ import com.github.maiqingqiang.goormhelper.sql2struct.impl.SQL2GoFrameStruct;
 import com.github.maiqingqiang.goormhelper.sql2struct.impl.SQL2GormStruct;
 import com.github.maiqingqiang.goormhelper.sql2struct.impl.SQL2Struct;
 import com.github.maiqingqiang.goormhelper.sql2struct.impl.SQL2XormStruct;
+import com.intellij.openapi.project.Project;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -61,12 +62,12 @@ public interface Types {
             return name;
         }
 
-        public ISQL2Struct sql2Struct(String sql, DbType dbType) {
+        public ISQL2Struct sql2Struct(Project project, String sql, DbType dbType) {
             return switch (this) {
-                case General -> new SQL2Struct(sql, dbType);
-                case Gorm -> new SQL2GormStruct(sql, dbType);
-                case Xorm -> new SQL2XormStruct(sql, dbType);
-                case GoFrame -> new SQL2GoFrameStruct(sql, dbType);
+                case General -> new SQL2Struct(project, sql, dbType);
+                case Gorm -> new SQL2GormStruct(project, sql, dbType);
+                case Xorm -> new SQL2XormStruct(project, sql, dbType);
+                case GoFrame -> new SQL2GoFrameStruct(project, sql, dbType);
                 default -> null;
             };
         }
@@ -94,6 +95,22 @@ public interface Types {
         @Override
         public String toString() {
             return name;
+        }
+    }
+
+    enum TagMode {
+        Compact(GoORMHelperBundle.message("tagMode.Compact")),
+        Full(GoORMHelperBundle.message("tagMode.Full"));
+
+        private final String name;
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+        TagMode(String name) {
+            this.name = name;
         }
     }
 }
