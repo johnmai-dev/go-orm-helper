@@ -4,6 +4,16 @@
 
 ## [Unreleased]
 
+## [1.3.0] - 2025-01-28
+
+### Fixed
+
+- Fix SQL2Struct SQLCreateTableStatement ClassCastException bug. #31
+
+### Added
+
+- Support Switch Tag mode. #32
+
 ## [1.2.10] - 2024-09-29
 
 ### Fixed
@@ -151,8 +161,9 @@
 - ORM Code Completion
 - SQL to Struct
 
-[Unreleased]: https://github.com/maiqingqiang/go-orm-helper/compare/v1.2.10...HEAD
-[1.2.9]: https://github.com/maiqingqiang/go-orm-helper/compare/v1.2.9...v1.2.10
+[Unreleased]: https://github.com/maiqingqiang/go-orm-helper/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/maiqingqiang/go-orm-helper/compare/v1.2.10...v1.3.0
+[1.2.10]: https://github.com/maiqingqiang/go-orm-helper/compare/v1.2.9...v1.2.10
 [1.2.9]: https://github.com/maiqingqiang/go-orm-helper/compare/v1.2.8...v1.2.9
 [1.2.8]: https://github.com/maiqingqiang/go-orm-helper/compare/v1.2.7...v1.2.8
 [1.2.7]: https://github.com/maiqingqiang/go-orm-helper/compare/v1.2.6...v1.2.7
