@@ -87,23 +87,23 @@ public class SQL2Struct implements ISQL2Struct {
     }
 
     private void singleConvert(@NotNull StringBuilder stringBuilder, SQLStatement statement) {
-        SQLCreateTableStatement createTableStatement = (SQLCreateTableStatement) statement;
+        if (statement instanceof SQLCreateTableStatement createTableStatement) {
+            String tableName = Strings.clearQuote(createTableStatement.getTableName());
+            tableName = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, tableName);
 
-        String tableName = Strings.clearQuote(createTableStatement.getTableName());
-        tableName = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, tableName);
-
-        stringBuilder.append("type ").append(tableName).append(" struct {\n");
+            stringBuilder.append("type ").append(tableName).append(" struct {\n");
 
 
-        List<SQLTableElement> tableElementList = createTableStatement.getTableElementList();
+            List<SQLTableElement> tableElementList = createTableStatement.getTableElementList();
 
-        for (SQLTableElement sqlTableElement : tableElementList) {
-            if (sqlTableElement instanceof SQLColumnDefinition sqlColumnDefinition) {
-                generateStructField(stringBuilder, sqlColumnDefinition);
+            for (SQLTableElement sqlTableElement : tableElementList) {
+                if (sqlTableElement instanceof SQLColumnDefinition sqlColumnDefinition) {
+                    generateStructField(stringBuilder, sqlColumnDefinition);
+                }
             }
-        }
 
-        stringBuilder.append("}\n\n");
+            stringBuilder.append("}\n\n");
+        }
     }
 
     protected String getGoType(@NotNull SQLColumnDefinition definition) {
