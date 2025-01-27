@@ -52,7 +52,9 @@ public class SQL2StructAction extends AnAction {
 
             ISQL2Struct sql2Struct = finalSelectedORM.sql2Struct(project, text, finalSelectedDatabase.toDbType());
 
-            editor.getDocument().replaceString(start, end, sql2Struct.convert());
+            if (sql2Struct != null) {
+                editor.getDocument().replaceString(start, end, sql2Struct.convert());
+            }
         });
     }
 }
