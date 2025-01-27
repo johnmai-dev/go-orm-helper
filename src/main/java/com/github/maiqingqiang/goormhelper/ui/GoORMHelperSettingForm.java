@@ -29,6 +29,8 @@ public class GoORMHelperSettingForm implements ConfigurableUi<GoORMHelperProject
     private JPanel panel;
     private ComboBox<Types.ORM> ormComboBox;
     private ComboBox<Types.Database> databaseComboBox;
+    private ComboBox<Types.TagMode> tagModeComboBox;
+
     private JCheckBox enableGlobalScanCheckBox;
     private ListTableModel<String> scanPathListTableModel;
     //    private TextFieldWithBrowseButton sqlPathTextField;
@@ -63,6 +65,8 @@ public class GoORMHelperSettingForm implements ConfigurableUi<GoORMHelperProject
     private void initComponent() {
         ormComboBox = new ComboBox<>(Types.ORM.values());
         databaseComboBox = new ComboBox<>(Types.Database.values());
+        tagModeComboBox = new ComboBox<>(Types.TagMode.values());
+
         enableGlobalScanCheckBox = new JCheckBox(GoORMHelperBundle.message("setting.enableGlobalScanCheckBox.title"));
         findStructTableNameFuncCheckBox = new JCheckBox(GoORMHelperBundle.message("setting.findStructTableNameFuncCheckBox.title"));
 
@@ -70,6 +74,7 @@ public class GoORMHelperSettingForm implements ConfigurableUi<GoORMHelperProject
                 .createFormBuilder()
                 .addLabeledComponent(GoORMHelperBundle.message("setting.ormComboBox.title"), ormComboBox)
                 .addLabeledComponent(GoORMHelperBundle.message("setting.databaseComboBox.title"), databaseComboBox)
+                .addLabeledComponent(GoORMHelperBundle.message("setting.tagModeComboBox.title"), tagModeComboBox)
                 .addComponent(enableGlobalScanCheckBox)
                 .addComponentFillVertically(initScanPathComponent(), 0)
                 .addComponent(new JSeparator())
@@ -134,6 +139,8 @@ public class GoORMHelperSettingForm implements ConfigurableUi<GoORMHelperProject
 
         ormComboBox.setSelectedItem(state.defaultORM);
         databaseComboBox.setSelectedItem(state.defaultDatabase);
+        tagModeComboBox.setSelectedItem(state.defaultTagMode);
+
 //        sqlPathTextField.setText(state.sqlPath);
         enableGlobalScanCheckBox.setSelected(state.enableGlobalScan);
         findStructTableNameFuncCheckBox.setSelected(state.findStructTableNameFunc);
@@ -147,6 +154,7 @@ public class GoORMHelperSettingForm implements ConfigurableUi<GoORMHelperProject
 
         return !(ormComboBox.getSelectedItem() == state.defaultORM
                 && databaseComboBox.getSelectedItem() == state.defaultDatabase
+                && tagModeComboBox.getSelectedItem() == state.defaultTagMode
 //                && sqlPathTextField.getText().equals(state.sqlPath)
                 && enableGlobalScanCheckBox.isSelected() == state.enableGlobalScan
                 && findStructTableNameFuncCheckBox.isSelected() == state.findStructTableNameFunc
@@ -160,6 +168,7 @@ public class GoORMHelperSettingForm implements ConfigurableUi<GoORMHelperProject
         List<String> oldscanPathList = scanPathListTableModel.getItems();
 
         settings.setDefaultDatabase((Types.Database) databaseComboBox.getSelectedItem());
+        settings.setDefaultTagMode((Types.TagMode) tagModeComboBox.getSelectedItem());
         settings.setDefaultORM((Types.ORM) ormComboBox.getSelectedItem());
         settings.setEnableGlobalScan(enableGlobalScanCheckBox.isSelected());
         settings.setFindStructTableNameFunc(findStructTableNameFuncCheckBox.isSelected());

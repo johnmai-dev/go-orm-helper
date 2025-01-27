@@ -10,6 +10,7 @@ import com.alibaba.druid.sql.ast.statement.SQLTableElement;
 import com.github.maiqingqiang.goormhelper.sql2struct.ISQL2Struct;
 import com.github.maiqingqiang.goormhelper.utils.Strings;
 import com.google.common.base.CaseFormat;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -63,11 +64,13 @@ public class SQL2Struct implements ISQL2Struct {
     private static final String defaultUnsignedDataType = "uint32";
     private final String sql;
     private final DbType dbType;
+    protected final Project project;
 
 
-    public SQL2Struct(String sql, DbType dbType) {
+    public SQL2Struct(Project project, String sql, DbType dbType) {
         this.sql = sql;
         this.dbType = dbType;
+        this.project = project;
     }
 
     public String convert() {

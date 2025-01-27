@@ -85,7 +85,7 @@ public class EditorPasteListener extends EditorActionHandler {
                 return;
             }
 
-            ISQL2Struct sql2Struct = finalSelectedORM.sql2Struct(text, finalSelectedDatabase.toDbType());
+            ISQL2Struct sql2Struct = finalSelectedORM.sql2Struct(project, text, finalSelectedDatabase.toDbType());
             if (sql2Struct == null) {
                 return;
             }

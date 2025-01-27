@@ -44,6 +44,10 @@ public final class GoORMHelperProjectSettings implements PersistentStateComponen
         state.defaultDatabase = database;
     }
 
+    public void setDefaultTagMode(Types.TagMode tagMode) {
+        state.defaultTagMode = tagMode;
+    }
+
     public void setEnableGlobalScan(boolean enable) {
         state.enableGlobalScan = enable;
     }
@@ -59,6 +63,7 @@ public final class GoORMHelperProjectSettings implements PersistentStateComponen
     public static class State extends SimpleModificationTracker {
         public Types.ORM defaultORM = Types.ORM.AskEveryTime;
         public Types.Database defaultDatabase = Types.Database.AskEveryTime;
+        public Types.TagMode defaultTagMode = Types.TagMode.Full;
         public boolean enableGlobalScan = true;
 
 
