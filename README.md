@@ -66,9 +66,7 @@ Selected SQL -> Editor Popup Menu -> Go ORM Helper Tool -> SQL Convert Struct
 
 ### Install Plugin from Jetbrains Marketplace
 
-<a href="https://plugins.jetbrains.com/plugin/22173-go-orm-helper" target="_blank">
-    <img src="https://blog.johnmai.top/go-orm-helper/assets/installation_button.svg" height="52" alt="Get from Marketplace" title="Get from Marketplace">
-</a>
+<iframe width="245px" height="48px" src="https://plugins.jetbrains.com/embeddable/install/22173"></iframe>
 
 ### Install Plugin from Disk
 
