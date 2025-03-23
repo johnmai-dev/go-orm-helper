@@ -74,7 +74,3 @@ https://www.jetbrains.com/help/go/auto-completing-code.html#code-completion-for-
 
 - 下载【Go ORM 助手】插件包 [Releases](https://github.com/maiqingqiang/go-orm-helper/releases)
 - 安装插件教程: https://www.jetbrains.com/help/idea/managing-plugins.html
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=maiqingqiang/go-orm-helper&type=Date)](https://star-history.com/#maiqingqiang/go-orm-helper&Date)

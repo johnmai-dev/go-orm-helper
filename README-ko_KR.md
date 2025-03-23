@@ -52,7 +52,3 @@
 
 - [Go ORM 도우미] 플러그인 패키지 다운로드 [Releases](https://github.com/maiqingqiang/go-orm-helper/releases)
 - 플러그인 설치 자습서 https://www.jetbrains.com/help/idea/managing-plugins.html
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=maiqingqiang/go-orm-helper&type=Date)](https://star-history.com/#maiqingqiang/go-orm-helper&Date)

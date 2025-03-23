@@ -74,7 +74,3 @@ Selected SQL -> Editor Popup Menu -> Go ORM Helper Tool -> SQL Convert Struct
 
 - Download Go ORM Helper Plugin [Releases](https://github.com/maiqingqiang/go-orm-helper/releases)
 - Install plugins guide: https://www.jetbrains.com/help/idea/managing-plugins.html
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=maiqingqiang/go-orm-helper&type=Date)](https://star-history.com/#maiqingqiang/go-orm-helper&Date)

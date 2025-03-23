@@ -52,7 +52,3 @@
 
 - 【Go ORMアシスタント】プラグインパッケージのダウンロード [Releases](https://github.com/maiqingqiang/go-orm-helper/releases)
 - プラグイン・チュートリアルのインストール https://www.jetbrains.com/help/idea/managing-plugins.html
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=maiqingqiang/go-orm-helper&type=Date)](https://star-history.com/#maiqingqiang/go-orm-helper&Date)
