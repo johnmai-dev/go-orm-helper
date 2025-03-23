@@ -1,7 +1,7 @@
 [English](./README.md) | [简体中文](./README-zh_CN.md) | 日本語 | [한국어](./README-ko_KR.md)
 
 <div align="center">
-    <img src="https://blog.johnmai.top/go-orm-helper/src/main/resources/icons/icon64x64.svg" alt="Go ORM アシスタント"/>
+    <img src="./src/main/resources/icons/icon64x64.svg" alt="Go ORM アシスタント"/>
     <h1 align="center">Go ORM アシスタント</h1>
 </div>
 
@@ -45,7 +45,7 @@
 ### Jetbrains Marketplace からプラグインをインストールする
 
 <a href="https://plugins.jetbrains.com/plugin/22173-go-orm-helper" target="_blank">
-    <img src="https://blog.johnmai.top/go-orm-helper/assets/installation_button.svg" height="52" alt="Get from Marketplace" title="Get from Marketplace">
+    <img src="./assets/installation_button.svg" height="52" alt="Get from Marketplace" title="Get from Marketplace">
 </a>
 
 ### ローカルインストール

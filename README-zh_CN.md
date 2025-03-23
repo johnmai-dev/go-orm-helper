@@ -1,7 +1,7 @@
 [English](./README.md) | 简体中文 | [日本語](./README-ja_JP.md) | [한국어](./README-ko_KR.md)
 
 <div align="center">
-    <img src="https://blog.johnmai.top/go-orm-helper/src/main/resources/icons/icon64x64.svg" alt="Go ORM Helper"/>
+    <img src="./src/main/resources/icons/icon64x64.svg" alt="Go ORM Helper"/>
     <h1 align="center">Go ORM 助手</h1>
 </div>
 
@@ -67,7 +67,7 @@ https://www.jetbrains.com/help/go/auto-completing-code.html#code-completion-for-
 ### 通过 Jetbrains Marketplace 安装
 
 <a href="https://plugins.jetbrains.com/plugin/22173-go-orm-helper" target="_blank">
-    <img src="https://blog.johnmai.top/go-orm-helper/assets/installation_button.svg" height="52" alt="Get from Marketplace" title="Get from Marketplace">
+    <img src="./assets/installation_button.svg" height="52" alt="Get from Marketplace" title="Get from Marketplace">
 </a>
 
 ### 本地安装

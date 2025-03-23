@@ -1,7 +1,7 @@
 English | [简体中文](./README-zh_CN.md) | [日本語](./README-ja_JP.md) | [한국어](./README-ko_KR.md)
 
 <div align="center">
-    <img src="https://blog.johnmai.top/go-orm-helper/src/main/resources/icons/icon64x64.svg" alt="Go ORM Helper"/>
+    <img src="./src/main/resources/icons/icon64x64.svg" alt="Go ORM Helper"/>
     <h1 align="center">Go ORM Helper</h1>
 </div>
 
@@ -66,7 +66,9 @@ Selected SQL -> Editor Popup Menu -> Go ORM Helper Tool -> SQL Convert Struct
 
 ### Install Plugin from Jetbrains Marketplace
 
-<iframe width="245px" height="48px" src="https://plugins.jetbrains.com/embeddable/install/22173"></iframe>
+<a href="https://plugins.jetbrains.com/plugin/22173-go-orm-helper" target="_blank">
+    <img src="./assets/installation_button.svg" height="52" alt="Get from Marketplace" title="Get from Marketplace">
+</a>
 
 ### Install Plugin from Disk
 
