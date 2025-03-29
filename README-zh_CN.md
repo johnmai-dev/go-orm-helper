@@ -61,8 +61,8 @@ https://www.jetbrains.com/help/go/auto-completing-code.html#code-completion-for-
 ## 安装
 
 > 兼容范围：
-> - GoLand — 2022.2+
-> - IntelliJ IDEA Ultimate — 2022.2+
+> - GoLand — 2024.2+
+> - IntelliJ IDEA Ultimate — 2024.2+
 
 ### 通过 Jetbrains Marketplace 安装
 

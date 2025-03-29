@@ -4,4 +4,4 @@
 .qodana
 build
 .DS_Store
-.intellijPlatform
+.kotlin

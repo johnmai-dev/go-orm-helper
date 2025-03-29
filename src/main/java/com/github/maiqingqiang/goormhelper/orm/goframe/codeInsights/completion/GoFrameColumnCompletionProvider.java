@@ -136,7 +136,8 @@ public class GoFrameColumnCompletionProvider extends ORMCompletionProvider {
                                 spec.getSpecType().getType() instanceof GoStructType goStructType) {
 
                             for (GoFieldDeclaration field : goStructType.getFieldDeclarationList()) {
-                                if (GoFrameTypes.ALLOW_FIELDS.contains(field.getFieldDefinitionList().get(0).getName()) && field.getType() != null) {
+                                if (field.getFieldDefinitionList().isEmpty()) continue;
+                                if (GoFrameTypes.ALLOW_FIELDS.contains(field.getFieldDefinitionList().getFirst().getName()) && field.getType() != null) {
                                     return field.getType();
                                 }
                             }
@@ -192,8 +193,9 @@ public class GoFrameColumnCompletionProvider extends ORMCompletionProvider {
             for (GoFieldDeclaration field : goStructType.getFieldDeclarationList()) {
 
                 if (!checkGoFieldDeclaration(field)) continue;
+                if (field.getFieldDefinitionList().isEmpty()) continue;
 
-                String name = field.getFieldDefinitionList().get(0).getName();
+                String name = field.getFieldDefinitionList().getFirst().getName();
 
                 String column = columnMap.get(name);
                 String comment = getComment(field);
