@@ -18,8 +18,8 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.progress.BackgroundTaskQueue;
 import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
@@ -66,37 +66,50 @@ public final class GoORMHelperCacheManager implements PersistentStateComponent<G
 
     public void scan() {
         LOG.info("Scan Schema");
-
-        BackgroundTaskQueue taskQueue = new BackgroundTaskQueue(project, GoORMHelperBundle.message("name"));
-        taskQueue.run(new Task.Backgroundable(project, GoORMHelperBundle.message("initializing.title")) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, GoORMHelperBundle.message("initializing.title")) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
-                if ((state.lastTimeChecked + Time.DAY) <= System.currentTimeMillis()) {
-                    state.lastTimeChecked = System.currentTimeMillis();
-
-                    state.schemaMapping.clear();
-                    state.scannedPathMapping.clear();
-                    state.tableStructMapping.clear();
-
-                    LOG.info("Clear GoORMHelperCache lastTimeChecked: " + state.lastTimeChecked);
+                if (isCacheExpired()) {
+                    clearCache();
                 }
 
-                GoORMHelperProjectSettings.State state = Objects.requireNonNull(GoORMHelperProjectSettings.getInstance(project).getState());
+                GoORMHelperProjectSettings.State settings = Objects.requireNonNull(GoORMHelperProjectSettings.getInstance(project).getState());
 
-                if (state.enableGlobalScan) {
-                    final VirtualFile projectDir = ProjectUtil.guessProjectDir(project);
-                    if (projectDir != null && projectDir.isValid()) {
-                        scanProject(projectDir, Types.EXCLUDED_SCAN_LIST);
-                    }
+                if (settings.enableGlobalScan) {
+                    scanGlobalProject();
                 } else {
-                    for (String path : state.scanPathList) {
-                        VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(path);
-                        if (file == null) continue;
-                        scanProject(file);
-                    }
+                    scanConfiguredPaths(settings);
                 }
             }
         });
+    }
+
+    private boolean isCacheExpired() {
+        return (state.lastTimeChecked + Time.DAY) <= System.currentTimeMillis();
+    }
+
+    private void clearCache() {
+        state.lastTimeChecked = System.currentTimeMillis();
+        state.schemaMapping.clear();
+        state.scannedPathMapping.clear();
+        state.tableStructMapping.clear();
+        LOG.info("Clear GoORMHelperCache lastTimeChecked: " + state.lastTimeChecked);
+    }
+
+    private void scanGlobalProject() {
+        final VirtualFile projectDir = ProjectUtil.guessProjectDir(project);
+        if (projectDir != null && projectDir.isValid()) {
+            scanProject(projectDir, Types.EXCLUDED_SCAN_LIST);
+        }
+    }
+
+    private void scanConfiguredPaths(GoORMHelperProjectSettings.State settings) {
+        for (String path : settings.scanPathList) {
+            VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(path);
+            if (file != null) {
+                scanProject(file);
+            }
+        }
     }
 
     public void scanProject(@NotNull VirtualFile virtualFile) {
@@ -105,7 +118,8 @@ public final class GoORMHelperCacheManager implements PersistentStateComponent<G
 
     public void scanProject(@NotNull VirtualFile root, List<String> excluded) {
         VfsUtilCore.iterateChildrenRecursively(root, file -> {
-            if (!root.getPath().equals(file.getPath()) && ((excluded != null && excluded.contains(file.getName())) || file.getName().startsWith(".")))
+            if (!root.getPath().equals(file.getPath()) &&
+                    ((excluded != null && excluded.contains(file.getName())) || file.getName().startsWith(".")))
                 return false;
 
             if (file.isDirectory()) return true;
@@ -113,121 +127,146 @@ public final class GoORMHelperCacheManager implements PersistentStateComponent<G
             return file.getFileType() instanceof GoFileType;
         }, fileOrDir -> {
             if (!fileOrDir.isDirectory()) {
-                ScannedPath scanned = state.scannedPathMapping.get(fileOrDir.getUrl());
-                if (scanned == null || scanned.getLastModified() != fileOrDir.getTimeStamp()) {
-                    fileOrDir.refresh(true, true, () -> parseGoFile(fileOrDir));
-                }
+                processGoFile(fileOrDir);
             }
             return true;
         });
     }
 
+    private void processGoFile(VirtualFile fileOrDir) {
+        ScannedPath scanned = state.scannedPathMapping.get(fileOrDir.getUrl());
+        if (scanned == null || scanned.getLastModified() != fileOrDir.getTimeStamp()) {
+            fileOrDir.refresh(true, true, () -> parseGoFile(fileOrDir));
+        }
+    }
+
     public void parseGoFile(@NotNull VirtualFile file) {
         try {
             ApplicationManager.getApplication().runReadAction(() -> {
-                if (!project.isDisposed()) {
-                    Document document = FileDocumentManager.getInstance().getDocument(file);
+                if (project.isDisposed()) return;
 
-                    if (document != null && PsiManager.getInstance(project).findFile(file) instanceof GoFile goFile) {
+                Document document = FileDocumentManager.getInstance().getDocument(file);
+                if (document == null) return;
 
-                        List<String> structList = new ArrayList<>();
+                GoFile goFile = (GoFile) PsiManager.getInstance(project).findFile(file);
+                if (goFile == null) return;
 
-                        Collection<GoTypeSpec> goTypeSpecCollection = PsiTreeUtil.findChildrenOfType(goFile, GoTypeSpec.class);
-
-                        for (GoTypeSpec typeSpec : goTypeSpecCollection) {
-                            String structName = typeSpec.getName();
-                            if (!(typeSpec.getSpecType().getType() instanceof GoStructType && structName != null))
-                                continue;
-
-                            addSchemaMapping(structName, file);
-                            structList.add(structName);
-
-                            GoORMHelperProjectSettings.State state = Objects.requireNonNull(GoORMHelperProjectSettings.getInstance(project).getState());
-
-                            String tableName = "";
-                            if (state.findStructTableNameFunc) {
-                                tableName = findTableName(typeSpec);
-                            }
-
-                            if (tableName.isEmpty()) {
-                                tableName = Strings.toSnakeCase(structName);
-
-                                String plural = English.plural(tableName);
-                                if (!plural.equals(tableName)) {
-                                    if (!tableName.trim().isEmpty() && !structName.trim().isEmpty()) {
-                                        this.state.tableStructMapping.put(tableName, structName);
-                                    }
-                                }
-                            }
-                            if (!tableName.trim().isEmpty() && !structName.trim().isEmpty()) {
-                                this.state.tableStructMapping.put(tableName, structName);
-                            }
-                        }
-
-                        addScannedPathMapping(file, structList);
-                    }
-                }
+                processGoFileStructs(file, goFile);
             });
-        } catch (IndexNotReadyException | IndexOutOfBoundsException ignored) {
+        } catch (IndexNotReadyException | IndexOutOfBoundsException e) {
+            LOG.debug("Error parsing Go file: " + file.getPath(), e);
+        }
+    }
+
+    private void processGoFileStructs(VirtualFile file, GoFile goFile) {
+        List<String> structList = new ArrayList<>();
+        Collection<GoTypeSpec> typeSpecs = PsiTreeUtil.findChildrenOfType(goFile, GoTypeSpec.class);
+
+        for (GoTypeSpec typeSpec : typeSpecs) {
+            String structName = typeSpec.getName();
+            if (!(typeSpec.getSpecType().getType() instanceof GoStructType) || structName == null) {
+                continue;
+            }
+
+            addSchemaMapping(structName, file);
+            structList.add(structName);
+
+            processTableMapping(typeSpec, structName);
+        }
+
+        addScannedPathMapping(file, structList);
+    }
+
+    private void processTableMapping(GoTypeSpec typeSpec, String structName) {
+        GoORMHelperProjectSettings.State settings = Objects.requireNonNull(
+                GoORMHelperProjectSettings.getInstance(project).getState());
+
+        String tableName = settings.findStructTableNameFunc ?
+                findTableName(typeSpec) : "";
+
+        if (tableName.isEmpty()) {
+            tableName = Strings.toSnakeCase(structName);
+
+            String plural = English.plural(tableName);
+            if (!plural.equals(tableName)) {
+                addTableStructMapping(tableName, structName);
+            }
+        }
+
+        addTableStructMapping(tableName, structName);
+    }
+
+    private void addTableStructMapping(String tableName, String structName) {
+        if (!tableName.trim().isEmpty() && !structName.trim().isEmpty()) {
+            this.state.tableStructMapping.put(tableName, structName);
         }
     }
 
     public void addSchemaMapping(String key, @NotNull VirtualFile file) {
         String fileUrl = file.getUrl();
 
-        if (this.state.schemaMapping.containsKey(key)) {
-            this.state.schemaMapping.get(key).add(fileUrl);
-        } else {
-            Set<String> list = new HashSet<>();
-            list.add(fileUrl);
-            this.state.schemaMapping.put(key, list);
-        }
+        this.state.schemaMapping.computeIfAbsent(key, k -> new HashSet<>()).add(fileUrl);
     }
 
     private String findTableName(@NotNull GoTypeSpec typeSpec) {
+        // 检查TableName方法
+        String tableName = findTableNameFromMethod(typeSpec);
+        if (!tableName.isEmpty()) {
+            return tableName;
+        }
+
+        return findTableNameFromEmbeddedFields(typeSpec);
+    }
+
+    private String findTableNameFromMethod(@NotNull GoTypeSpec typeSpec) {
         for (GoMethodDeclaration method : GoPsiImplUtil.getMethods(typeSpec)) {
             if (method.getName() != null && method.getName().equals(Types.TABLE_NAME_FUNC)) {
-                GoReturnStatement goReturnStatement = PsiTreeUtil.findChildOfType(method, GoReturnStatement.class);
-                if (goReturnStatement == null) continue;
+                GoReturnStatement returnStatement = PsiTreeUtil.findChildOfType(method, GoReturnStatement.class);
+                if (returnStatement == null || returnStatement.getExpressionList().isEmpty()) continue;
 
-                Value<?> value = goReturnStatement.getExpressionList().get(0).getValue();
+                Value<?> value = returnStatement.getExpressionList().getFirst().getValue();
                 if (value != null && value.getString() != null && !value.getString().isEmpty()) {
                     return value.getString();
                 }
             }
         }
+        return "";
+    }
 
-        if (typeSpec.getSpecType().getType() instanceof GoStructType goStructType) {
-            for (GoFieldDeclaration goFieldDeclaration : goStructType.getFieldDeclarationList()) {
-                if (goFieldDeclaration.getAnonymousFieldDefinition() == null) continue;
+    private String findTableNameFromEmbeddedFields(@NotNull GoTypeSpec typeSpec) {
+        if (!(typeSpec.getSpecType().getType() instanceof GoStructType goStructType)) {
+            return "";
+        }
 
-                GoType goType = goFieldDeclaration.getAnonymousFieldDefinition().getType();
+        for (GoFieldDeclaration field : goStructType.getFieldDeclarationList()) {
+            if (field.getAnonymousFieldDefinition() == null) continue;
 
-                GoTypeSpec goTypeSpec = (GoTypeSpec) goType.resolve(ResolveState.initial());
+            GoType goType = field.getAnonymousFieldDefinition().getType();
+            GoTypeSpec goTypeSpec = (GoTypeSpec) goType.resolve(ResolveState.initial());
+            if (goTypeSpec == null) continue;
 
-                if (goTypeSpec == null) continue;
+            GoTypeSpecDescriptor descriptor = GoTypeSpecDescriptor.of(goTypeSpec, goType, true);
+            if (descriptor == null) continue;
 
-                GoTypeSpecDescriptor descriptor = GoTypeSpecDescriptor.of(goTypeSpec, goType, true);
-
-                if (descriptor == null) continue;
-
-                if (descriptor.equals(GoFrameTypes.G_META) || descriptor.equals(GoFrameTypes.GMETA_META)) {
-                    GoTag tag = goFieldDeclaration.getTag();
-                    if (tag != null) {
-                        String ormText = tag.getValue("orm");
-                        if (ormText != null && ormText.contains("table:")) {
-                            String[] ormPropertyList = ormText.split(",");
-                            for (String s : ormPropertyList) {
-                                if (s.contains("table:")) {
-                                    return s.replace("table:", "").trim();
-                                }
-                            }
-                        }
+            if (descriptor.equals(GoFrameTypes.G_META) || descriptor.equals(GoFrameTypes.GMETA_META)) {
+                GoTag tag = field.getTag();
+                if (tag != null) {
+                    String ormText = tag.getValue("orm");
+                    if (ormText != null && ormText.contains("table:")) {
+                        return extractTableNameFromTag(ormText);
                     }
                 }
             }
         }
+        return "";
+    }
 
+    private String extractTableNameFromTag(String ormText) {
+        for (String property : ormText.split(",")) {
+            if (property.contains("table:")) {
+                return property.replace("table:", "").trim();
+            }
+        }
         return "";
     }
 

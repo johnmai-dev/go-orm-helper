@@ -39,8 +39,8 @@
 ## インストール
 
 > 互換性範囲:
-> - GoLand — 2022.2+
-> - IntelliJ IDEA Ultimate — 2022.2+
+> - GoLand — 2024.2+
+> - IntelliJ IDEA Ultimate — 2024.2+
 
 ### Jetbrains Marketplace からプラグインをインストールする
 

@@ -61,8 +61,8 @@ Selected SQL -> Editor Popup Menu -> Go ORM Helper Tool -> SQL Convert Struct
 ## Installation
 
 > Compatibility Range:
-> - GoLand — 2022.2+
-> - IntelliJ IDEA Ultimate — 2022.2+
+> - GoLand — 2024.2+
+> - IntelliJ IDEA Ultimate — 2024.2+
 
 ### Install Plugin from Jetbrains Marketplace
 

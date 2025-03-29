@@ -345,8 +345,8 @@ public abstract class ORMCompletionProvider extends CompletionProvider<Completio
                         scanFields(parameters, descriptor, result, spec);
                         continue;
                     }
-
-                    String name = field.getFieldDefinitionList().get(0).getName();
+                    if (field.getFieldDefinitionList().isEmpty()) continue;
+                    String name = field.getFieldDefinitionList().getFirst().getName();
 
                     if (name != null) {
                         column = Strings.toSnakeCase(name);
