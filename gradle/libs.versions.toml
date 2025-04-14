@@ -12,7 +12,7 @@ annotations = "26.0.2"
 changelog = "2.2.1"
 intelliJPlatform = "2.2.1"
 kotlin = "1.9.25"
-kover = "0.8.3"
+kover = "0.9.1"
 qodana = "2024.3.4"
 
 [libraries]
